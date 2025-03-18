@@ -17,7 +17,7 @@ def read_huffman_codes(code_file_path):
            'char' : code
     """
     codes = {}
-    try:
+    try: 
         with open(code_file_path, 'r') as file:
             for line in file:
                 if not line.strip():
