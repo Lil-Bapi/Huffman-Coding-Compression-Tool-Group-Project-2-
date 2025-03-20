@@ -4,27 +4,25 @@ from tkinter import filedialog
 import tkinter
 
 import encoding
-import decompress
 
 
 ##########################################################################
 
+#variables for the original and compressed sizes of the files
+#(before and after compression)
 ogSizeInt = "N/A"
 cSizeInt = "N/A"
 ratioStr = "N/A"
 
-#huffmanCodeText = "Enter text by typing or loading a .txt file."
-outPath = None
+#var for the huffman tree
 treePtr = None
-filePath = ""
 
 ##########################################################################
 
 
-#functions for retrieving 
+#functions for retrieving files
 def getFile():
     try:
-        global filePath
         filePath = filedialog.askopenfilename()
         if filePath[len(filePath)-3:] != "txt":
             print("Not a proper .txt file")
@@ -39,7 +37,7 @@ def getFile():
     except:
         print("oopsies text no worky")
 
-
+#function for changing the text in the text box for the huffman codes
 def getHuffmanTextFF(textEntry):
     try:
         textContent = ""
@@ -52,7 +50,7 @@ def getHuffmanTextFF(textEntry):
     except:
         print("oops")
 
-
+#function for changing the text in the text box for the input
 def getTextFF(textEntry):
     try:
         text = getFile()
@@ -62,17 +60,16 @@ def getTextFF(textEntry):
     except:
         print("oh no")
 
+#function for changing performing the encoding process when the button is pushed
 def encodeText(textEntry, huffEntry, infoBox):
     global treePtr
-    global outPath
     global ogSizeInt
     global cSizeInt
     global ratioStr
-    global infoText
 
-    text = textEntry.get("1.0", tkinter.END)
+    text = textEntry.get("1.0", tkinter.END)        #delete the original text in the OG textbox
     treePtr = encoding.build_huffman_tree(text)
-    outPath = encoding.getHFFMCodes(text)
+    encoding.getHFFMCodes(text)
 
     ogSizeInt = encoding.original_size
     cSizeInt = encoding.compressed_bytes
@@ -83,6 +80,7 @@ def encodeText(textEntry, huffEntry, infoBox):
 
     getHuffmanTextFF(huffEntry)
 
+#function for when the decompression button is pressed
 def decompressText(textEntry):
     try:
         newText = encoding.decompress_file("compressedBinary.txt", treePtr)
@@ -134,8 +132,8 @@ huffmanCodesTextBox.config(state="disabled")
 entryE = scrolledtext.ScrolledText(root, wrap=tkinter.WORD, width=50, height=8)
 entryE.grid(column=0, row=3, pady=10)
 
+#the load and encode buttons (on the same row because of the buttonFrame tkinter frame)
 loadFile = ttk.Button(buttonFrame, text="Load Text To Encode File", command=lambda: getTextFF(entryE)).grid(column=1, row=2, padx=14)
-
 encode = ttk.Button(buttonFrame, text="Encode", command=lambda: encodeText(entryE, huffmanCodesTextBox, infoTextBox)).grid(column=0, row=2)
 
 #huffman section of gui
@@ -154,11 +152,12 @@ entryD = scrolledtext.ScrolledText(root, wrap=tkinter.WORD, width=50, height=8)
 entryD.grid(column=0, row=8, pady=10)
 entryD.config(state="disabled")
 
+#decode button
 decode = ttk.Button(root, text="Decode", command=lambda: decompressText(entryD)).grid(column=0, row=7)
 
-
+#quit button
 quitButton = ttk.Button(root, text="Quit", command=root.destroy).grid(column=0, row=9)
 
-
+#main window loop
 root.mainloop()
 
