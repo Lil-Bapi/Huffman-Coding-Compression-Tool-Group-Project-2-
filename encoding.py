@@ -4,6 +4,16 @@ import sys
 from collections import Counter, namedtuple
 from bitarray import bitarray
 
+#Im lazy
+global compression_percentage
+compression_percentage = 0
+global comrpessed_bytes
+compressed_bytes = 0
+global original_size
+original_size = 0
+
+
+
 # Huffman Tree Node
 class Node(namedtuple("Node", ["char", "freq", "left", "right"])):
     def __lt__(self, other):
@@ -48,7 +58,7 @@ def save_compressed_file(text, output_path):
         file.write(len(text).to_bytes(4, "big"))  # Store original length
         file.write(encoded_text.tobytes())       # Store compressed data
 
-    return huffman_tree, output_path
+    return output_path
 
 # Decode Huffman encoded binary data
 def decode_text(encoded_text, huffman_tree, original_length):
@@ -68,25 +78,26 @@ def decode_text(encoded_text, huffman_tree, original_length):
     return "".join(decoded_text)
 
 # Read compressed file and decompress it
-def decompress_file(input_path, output_path, huffman_tree):
+def decompress_file(input_path, huffman_tree):
     with open(input_path, "rb") as file:
         original_length = int.from_bytes(file.read(4), "big")  # Read original length
         encoded_data = file.read()  # Read compressed data
 
     decoded_text = decode_text(encoded_data, huffman_tree, original_length)
 
+    output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "decompressed.txt")
     with open(output_path, "w") as file:
         file.write(decoded_text)
 
-    return output_path
+    return decoded_text
 
 # Save Huffman codes to a text file
-def save_huffman_codes_to_file(file_path, text, codes, original_size, compressed_bytes, compression_percentage):
+def save_huffman_codes_to_file(codes):
     # Create output filename based on input filename
-    base_name = os.path.basename(file_path)
-    name_without_ext = os.path.splitext(base_name)[0]
-    output_file = f"{name_without_ext}_huffman_codes.txt"
-    output_path = os.path.join(os.path.dirname(file_path), output_file)
+    #base_name = os.path.basename(file_path)
+    #name_without_ext = os.path.splitext(base_name)[0]
+    #output_file = f"{name_without_ext}_huffman_codes.txt"
+    output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "huffmanCodes.txt")
     
     with open(output_path, 'w') as out_file:
         
@@ -107,22 +118,15 @@ def save_huffman_codes_to_file(file_path, text, codes, original_size, compressed
     
     return output_path
 
-# Display Huffman codes from a text file
-def display_huffman_codes_from_file(file_path):
-    try:
-        with open(file_path, 'r') as file:
-            text = file.read()
-    except FileNotFoundError:
-        print(f"Error: File '{file_path}' not found.")
-        return
-    except Exception as e:
-        print(f"Error reading file: {e}")
-        return
-    
-    if not text:
-        print("Error: File is empty.")
-        return
-    
+#get huffman codes from text
+def getHFFMCodes(text):
+
+    #im really lazy
+    global compression_percentage
+    global compressed_bytes
+    global original_size
+
+
     # Original file size (in bytes)
     original_size = len(text.encode('utf-8'))
     
@@ -140,7 +144,7 @@ def display_huffman_codes_from_file(file_path):
     else:
         compression_percentage = 0
     
-    print(f"Huffman codes for '{file_path}':")
+    #print(f"Huffman codes for '{file_path}':")
     print(f"Original size: {original_size} bytes")
     print(f"Compressed size: {compressed_bytes} bytes")
     print(f"Compression: {compression_percentage:.2f}%")
@@ -162,8 +166,34 @@ def display_huffman_codes_from_file(file_path):
         print(f"'{display_char}': {code}")
     
     # Save the Huffman codes to a file
-    output_path = save_huffman_codes_to_file(file_path, text, codes, original_size, compressed_bytes, compression_percentage)
+    output_path = save_huffman_codes_to_file(codes)
     print(f"\nHuffman codes saved to: {output_path}")
+
+    
+    output_path = save_compressed_file(text, os.path.join(os.path.dirname(os.path.abspath(__file__)), "compressedBinary.txt"))
+    print(f"\nHuffman binary was saved to {output_path}")
+
+    return output_path
+
+
+# Display Huffman codes from a text file
+def display_huffman_codes_from_file(file_path):
+    try:
+        with open(file_path, 'r') as file:
+            text = file.read()
+    except FileNotFoundError:
+        print(f"Error: File '{file_path}' not found.")
+        return
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        return
+    
+    if not text:
+        print("Error: File is empty.")
+        return
+    
+    getHFFMCodes(text)
+
 
 # Example Usage
 if __name__ == "__main__":
