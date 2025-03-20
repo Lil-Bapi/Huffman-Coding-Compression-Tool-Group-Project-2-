@@ -20,7 +20,17 @@ treePtr = None
 ##########################################################################
 
 
-#functions for retrieving files
+"""
+Opens a file dialog to select a .txt file in order to read its content. 
+
+This function allows the user to choose a text file from their system and 
+return its content as a string. It checks if the selected file is a valid 
+text file and handles potential errors.
+
+Returns :
+        textContent (string) : content of the selected file as a string IF
+                              successful. Else if error occurs 'None' is returned
+"""
 def getFile():
     try:
         filePath = filedialog.askopenfilename()
