@@ -47,7 +47,15 @@ def getFile():
     except:
         print("oopsies text no worky")
 
-#function for changing the text in the text box for the huffman codes
+"""
+ Function for changing the text in the text box for the huffman codes.
+ Reads the generated Huffman codes from 'huffmanCodes.txt' and inserts
+ them into the provided text box. 
+
+ This function also reads the content of the file and displays the codes in the 
+ textbox.
+"""
+
 def getHuffmanTextFF(textEntry):
     try:
         textContent = ""
@@ -60,7 +68,13 @@ def getHuffmanTextFF(textEntry):
     except:
         print("oops")
 
-#function for changing the text in the text box for the input
+"""
+ Loads the contents of the selected text file and inserts it into 
+ the provided textbox. This function also a file selection window to load a text file 
+ and inserts its contents into the specified text box. The file content is 
+ also passed to the Huffman encoding function in order to generate the codes themselves.
+
+"""
 def getTextFF(textEntry):
     try:
         text = getFile()
@@ -70,7 +84,21 @@ def getTextFF(textEntry):
     except:
         print("oh no")
 
-#function for changing performing the encoding process when the button is pushed
+"""
+Function for performing the encoding process when the button is pushed.
+This function retrieves the text from the input box, generates Huffman codes
+and updates the Huffman codes and compression information.
+
+    Args:
+        textEntry (tkinter.Text): The text box containing the text to be encoded.
+
+        huffEntry (tkinter.Text):The text box where the Huffman codes will be displayed.
+
+        infoBox (ttk.Label): The label that displays compression information.
+
+    Returns:
+        None
+"""
 def encodeText(textEntry, huffEntry, infoBox):
     global treePtr
     global ogSizeInt
@@ -78,19 +106,28 @@ def encodeText(textEntry, huffEntry, infoBox):
     global ratioStr
 
     text = textEntry.get("1.0", tkinter.END)        #delete the original text in the OG textbox
+    # build the huffman tree and generate huffman codes
     treePtr = encoding.build_huffman_tree(text)
     encoding.getHFFMCodes(text)
 
     ogSizeInt = encoding.original_size
     cSizeInt = encoding.compressed_bytes
     ratioStr = encoding.compression_percentage
-
+    # this will update compression information in the GUI
     infoBox.config(text=f"OG Size: {ogSizeInt} bytes | Compressed Size: {cSizeInt} bytes | Ratio: {ratioStr:.2f}%")
     print()
 
     getHuffmanTextFF(huffEntry)
 
-#function for when the decompression button is pressed
+"""
+Function for when the decompression button is pressed.  
+Decompresses the encoded binary file and displays the decompressed text in the GUI.
+This function decompresses the contents of 'compressedBinary.txt' using the generated
+Huffman tree and inserts the decompressed text into the specified text box.
+
+    Args:
+        textEntry (tkinter.Text): The text box where the decompressed text will be displayed.
+"""
 def decompressText(textEntry):
     try:
         newText = encoding.decompress_file("compressedBinary.txt", treePtr)
